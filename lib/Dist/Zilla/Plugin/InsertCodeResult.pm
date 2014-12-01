@@ -28,8 +28,8 @@ sub munge_files {
 sub munge_file {
     my ($self, $file) = @_;
     my $content = $file->content;
-    if($content =~ s{^#\s*CODE:\s*(.*)\s*$}{$self->_code_result($1)."\n"}egm) {
-        $self->log(['inserting result of code '%s' in %s', $1, $file->name]);
+    if ($content =~ s{^#\s*CODE:\s*(.*)\s*$}{$self->_code_result($1)."\n"}egm) {
+        $self->log(["inserting result of code '%s' in %s", $1, $file->name]);
         $file->content($content);
     }
 }
@@ -37,10 +37,13 @@ sub munge_file {
 sub _code_result {
     my($self, $code) = @_;
 
+    local @INC = @INC;
+    unshift @INC, "lib";
+
     my $res = eval $code;
 
     if ($@) {
-        $res = "# InsertCodeResult: eval failed: $@";
+        die "eval '$code' failed: $@";
     } else {
         unless (defined($res) && !ref($res)) {
             $res = dump($res);
