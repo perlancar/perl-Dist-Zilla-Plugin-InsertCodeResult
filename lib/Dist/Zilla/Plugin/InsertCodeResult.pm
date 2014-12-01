@@ -68,7 +68,7 @@ In dist.ini:
 
 In your POD:
 
- # CODE:
+ # CODE: require MyLib; MyLib::gen_stuff("some", "param");
 
 
 =head1 DESCRIPTION
