@@ -76,9 +76,7 @@ In your POD:
 This module finds C<# CODE: ...> directives in your POD, evals the specified
 Perl code, and insert the result into your POD as a verbatim paragraph. If
 result is a simple scalar, it is printed as is. If it is undef or a reference,
-it will be dumped using L<Data::Dump>. If eval fails, a message like this will be inserted instead:
-
- # eval failed: syntax error at -e line 1, near ""x;" say"
+it will be dumped using L<Data::Dump>. If eval fails, build will be aborted.
 
 
 =head1 SEE ALSO
