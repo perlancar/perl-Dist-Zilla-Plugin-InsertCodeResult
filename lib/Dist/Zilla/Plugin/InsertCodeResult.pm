@@ -17,6 +17,8 @@ with (
     },
 );
 
+has make_verbatim => (is => 'rw', default => sub{1});
+
 use namespace::autoclean;
 
 sub munge_files {
@@ -50,7 +52,7 @@ sub _code_result {
         }
     }
 
-    $res =~ s/^/ /gm;
+    $res =~ s/^/ /gm if $self->make_verbatim;
     $res;
 }
 
@@ -65,6 +67,7 @@ __PACKAGE__->meta->make_immutable;
 In dist.ini:
 
  [InsertCodeResult]
+ ;make_verbatim=1
 
 In your POD:
 
@@ -74,7 +77,8 @@ In your POD:
 =head1 DESCRIPTION
 
 This module finds C<# CODE: ...> directives in your POD, evals the specified
-Perl code, and insert the result into your POD as a verbatim paragraph. If
+Perl code, and insert the result into your POD as a verbatim paragraph (unless
+you set C<make_verbatim> to 0, in which case output will be inserted as-is). If
 result is a simple scalar, it is printed as is. If it is undef or a reference,
 it will be dumped using L<Data::Dump>. If eval fails, build will be aborted.
 
