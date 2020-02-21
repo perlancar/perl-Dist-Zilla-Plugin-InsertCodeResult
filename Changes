@@ -1,3 +1,8 @@
+0.052   2020-02-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow multiline code with #BEGIN_CODE .. #END_CODE syntax.
+
+
 0.051   2019-02-04  Released-By: PERLANCAR
 
 	- [ux] Log result of code using log_debug() instead of log().
