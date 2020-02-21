@@ -1,6 +1,8 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
+# AUTHORITY
 # DATE
+# DIST
 # VERSION
 
 use 5.010001;
@@ -30,9 +32,14 @@ sub munge_files {
 sub munge_file {
     my ($self, $file) = @_;
     my $content = $file->content;
-    if ($content =~ s{^#\s*CODE:\s*(.*)\s*$}{$self->_code_result($1)."\n"}egm) {
-        $self->log(["inserting result of code '%s' in %s", $1, $file->name]);
-        $self->log_debug(["result of code: '%s'", $content]);
+    if ($content =~ s{
+                         ^\#\s*CODE:\s*(.*)\s*$ |
+                         ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
+                 }{
+                     $self->_code_result($1 // $2)."\n"
+                 }egmx) {
+        $self->log(["inserting result of code '%s' in %s", $1 // $2, $file->name]);
+        $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content]);
         $file->content($content);
     }
 }
@@ -74,16 +81,30 @@ In your POD:
 
  # CODE: require MyLib; MyLib::gen_stuff("some", "param");
 
+or for multiline code:
+
+ # BEGIN_CODE
+ require MyLib;
+ MyLib::gen_stuff("some", "param");
+ ...
+ # END_CODE
+
+
 
 =head1 DESCRIPTION
 
-This module finds C<# CODE: ...> directives in your POD, evals the specified
-Perl code, and insert the result into your POD as a verbatim paragraph (unless
-you set C<make_verbatim> to 0, in which case output will be inserted as-is). If
-result is a simple scalar, it is printed as is. If it is undef or a reference,
-it will be dumped using L<Data::Dump>. If eval fails, build will be aborted.
+This module finds C<# CODE: ...> or C<# BEGIN_CODE> and C<# END CODE> directives
+in your POD, evals the specified Perl code, and insert the result into your POD
+as a verbatim paragraph (unless you set C<make_verbatim> to 0, in which case
+output will be inserted as-is). If result is a simple scalar, it is printed as
+is. If it is undef or a reference, it will be dumped using L<Data::Dump>. If
+eval fails, build will be aborted.
+
+The directives must be at the first column of the line.
 
 
 =head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::InsertCodeOutput>
 
 L<Dist::Zilla::Plugin::InsertExample>
