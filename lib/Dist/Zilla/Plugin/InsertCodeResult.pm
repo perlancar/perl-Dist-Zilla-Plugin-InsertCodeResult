@@ -31,16 +31,16 @@ sub munge_files {
 
 sub munge_file {
     my ($self, $file) = @_;
-    my $content = $file->content;
-    if ($content =~ s{
-                         ^\#\s*CODE:\s*(.*)\s*$ |
-                         ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
-                 }{
-                     $self->_code_result($1 // $2)."\n"
-                 }egmx) {
+    my $content_as_bytes = $file->encoded_content;
+    if ($content_as_bytes =~ s{
+                                  ^\#\s*CODE:\s*(.*)\s*$ |
+                                  ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
+                          }{
+                              $self->_code_result($1 // $2)."\n"
+                          }egmx) {
         $self->log(["inserting result of code '%s' in %s", $1 // $2, $file->name]);
-        $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content]);
-        $file->content($content);
+        $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content_as_bytes]);
+        $file->encoded_content($content_as_bytes);
     }
 }
 
