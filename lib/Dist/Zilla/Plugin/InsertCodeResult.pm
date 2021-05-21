@@ -33,10 +33,12 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
     if ($content_as_bytes =~ s{
-                                  ^\#\s*CODE:\s*(.*)\s*$ |
+                                  ^\#\s*CODE:\s*(.*)\s*(\R|\z) |
                                   ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
                           }{
-                              $self->_code_result($1 // $2)."\n"
+                              my $res = $self->_code_result($1 // $2);
+                              $res .= "\n" unless $res =~ /\R\z/;
+                              $res;
                           }egmx) {
         $self->log(["inserting result of code '%s' in %s", $1 // $2, $file->name]);
         $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content_as_bytes]);
