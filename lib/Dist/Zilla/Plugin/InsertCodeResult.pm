@@ -33,7 +33,7 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
     if ($content_as_bytes =~ s{
-                                  ^\#\s*CODE:\s*(.*)\s*(\R|\z) |
+                                  ^\#\s*CODE:\s*(.*)\s*(?:\R|\z) |
                                   ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
                           }{
                               my $res = $self->_code_result($1 // $2);
