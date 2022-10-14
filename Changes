@@ -1,4 +1,4 @@
-0.055   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+0.055   2021-08-06  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Fix bug in regexp (wrong capture).
 
