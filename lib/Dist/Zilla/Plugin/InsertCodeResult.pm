@@ -1,15 +1,11 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Data::Dump qw(dump);
+use String::CommonPrefix qw(common_prefix);
 
 use Moose;
 with (
@@ -22,6 +18,11 @@ with (
 has make_verbatim => (is => 'rw', default => sub{1});
 
 use namespace::autoclean;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 sub munge_files {
     my $self = shift;
@@ -52,7 +53,15 @@ sub _code_result {
     local @INC = @INC;
     unshift @INC, "lib";
 
-    my $res = eval $code;
+  REMOVE_COMMENT: {
+        my @lines = split /^/m, $code;
+        my $common_prefix = common_prefix(@lines);
+        if ($common_prefix =~ /\A\#+\s*\z/) {
+            $code =~ s/^\Q$common_prefix\E//gm;
+        }
+    }
+
+    my $res = eval $code;## no critic: BuiltinFunctions::ProhibitStringyEval
 
     if ($@) {
         die "eval '$code' failed: $@";
@@ -91,6 +100,14 @@ or for multiline code:
  ...
  # END_CODE
 
+(you can prefix each line in multiline code with comment, to prevent this code
+from being analyzed by other analyzers e.g. L<scan_prereqs>):
+
+ # BEGIN_CODE
+ #require MyLib;
+ #MyLib::gen_stuff("some", "param");
+ #...
+ # END_CODE
 
 
 =head1 DESCRIPTION
